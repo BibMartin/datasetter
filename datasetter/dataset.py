@@ -1,16 +1,4 @@
 # Dataset : base class for datasetter
-
-import pandas as pd
-import json
-
-
-def as_json(doc):
-    return json.loads(
-        pd.Series([doc])
-        .to_json(orient='records', date_format='iso')
-        )[0]
-
-
 class FacetUnavailableError(Exception):
     """This class is used to raise exceptions due to unavailable facets."""
     pass
