@@ -12,6 +12,11 @@ def as_json(doc):
         )[0]
 
 
+class FacetUnavailableError(Exception):
+    """This class is used to raise exceptions due to unavailable facets."""
+    pass
+
+
 class Dataset(object):
     def __init__(self, dataframe, facets, metadata=None):
         # self._data = dataframe
