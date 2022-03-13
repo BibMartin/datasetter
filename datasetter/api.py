@@ -1,7 +1,9 @@
 import forge
+from fastapi import HTTPException
 from typing import Optional
 import pandas as pd
 import json
+from datasetter.dataset import FacetUnavailableError
 
 
 def as_json(doc):
@@ -11,7 +13,7 @@ def as_json(doc):
         )[0]
 
 
-def add_dataset(dataset, fast_api, uri):
+def add_dataset(fast_api, uri, dataset):
     """Create FastAPI endpoints to serve the dataset.
 
     Parameters
@@ -52,14 +54,18 @@ def add_dataset(dataset, fast_api, uri):
     @forge.sign(facet, rows, skip, *kwargs)
     def count_by(facet, rows=10, skip=0, **kwargs):
         filters = {key: val for key, val in kwargs.items() if val is not None}
-        result = dataset.count_by(facet, rows=rows, skip=skip, **filters)
+        try:
+            result = dataset.count_by(facet, rows=rows, skip=skip, **filters)
+        except FacetUnavailableError:
+            raise HTTPException(status_code=404,
+                                detail="FacetUnavailableError: no facet {}".format(facet))
         return as_json({
             "facet": facet,
             # "count": len(result),  # TODO : add "nunique" feature in count_by schema
             "rows": len(result),
             "skip": skip,
             "filters": filters,
-            "data": {str(key): int(val) for key, val in result.items()},
+            "data": [{"value": str(key), "count": int(val)} for key, val in result.items()],
             })
 
     @fast_api.get(uri + "/sample")

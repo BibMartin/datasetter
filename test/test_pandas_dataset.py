@@ -67,4 +67,3 @@ def test_sample():
 
     with pytest.raises(FacetUnavailableError):
         dataset.sample(number=12)
-    assert True
