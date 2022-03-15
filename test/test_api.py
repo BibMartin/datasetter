@@ -24,13 +24,14 @@ df = pd.DataFrame([
 metadata = {
     "description": "A simple dataset to make tests.",
     "facets": ['letter', 'greek'],
+    "name": "Random letters",
     "columns": [
         {"name": "letter", "type": "string", "description": "A column with letters."},
         {"name": "greek", "type": "string", "description": "A column with greek letters."},
         {"name": "number", "type": "integer", "description": "A column with numbers."},
         ]}
 
-dataset = PandasDataset(df, ['letter', 'greek'], metadata=metadata)
+dataset = PandasDataset(df, **metadata)
 
 app = FastAPI()
 add_dataset(app, 'pandas-dataset', dataset)

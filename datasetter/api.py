@@ -38,7 +38,7 @@ def add_dataset(fast_api, uri, dataset):
 
     @fast_api.get(uri + "/")
     def get_metadata():
-        return as_json(dataset.metadata)
+        return as_json(dataset.metadata())
 
     @fast_api.get(uri + "/count")
     @forge.sign(*kwargs)
