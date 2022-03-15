@@ -1,6 +1,5 @@
 # Dataset : base class for datasetter
 
-from typing import Optional
 import pandas as pd
 import json
 
@@ -18,11 +17,16 @@ class FacetUnavailableError(Exception):
 
 
 class Dataset(object):
-    def __init__(self, dataframe, facets, metadata=None):
-        # self._data = dataframe
-        # self.facets = facets
-        # self.metadata = metadata
-        raise NotImplementedError()
+    def __init__(self,
+                 name=None,
+                 description=None,
+                 columns=None,
+                 facets=None,
+                 ):
+        self.facets = facets
+        self.name = name
+        self.description = description
+        self.columns = columns
 
     def count(self, **filters):
         """Counts the number of records in the Dataset.
@@ -79,67 +83,10 @@ class Dataset(object):
         """
         raise NotImplementedError()
 
-    def fastapi_serve(self, fast_api, uri):
-        """Create FastAPI endpoints to serve the dataset.
-
-        Parameters
-        ----------
-        fast_api : fastapi.applications.FastAPI
-            A FastAPI application object. A new endpoint will be added in this application.
-        uri : str
-            The relative uri where the endpoint will be added.
-
-        Returns
-        -------
-        Nothing : The endpoint is created as a side effect (inplace) in the `fast_api` application.
-        """
-        uri = '/' + uri.strip('/')
-        import forge
-        facet = forge.kwarg('facet', type=str)
-        rows = forge.kwarg('rows', default=10, type=Optional[int])
-        skip = forge.kwarg('skip', default=0, type=Optional[int])
-        kwargs = [forge.kwarg(facet, default=None, type=Optional[str])
-                  for facet in self.facets]
-
-        @fast_api.get(uri + "/")
-        def get_metadata():
-            return as_json(self.metadata)
-
-        @fast_api.get(uri + "/count")
-        @forge.sign(*kwargs)
-        def count(**kwargs):
-            filters = {key: val for key, val in kwargs.items() if val is not None}
-            count = self.count(**filters)
-            return as_json({
-                "count": int(count),
-                "filters": filters,
-                })
-
-        @fast_api.get(uri + "/count-by/{facet}")
-        @forge.sign(facet, rows, skip, *kwargs)
-        def count_by(facet, rows=10, skip=0, **kwargs):
-            filters = {key: val for key, val in kwargs.items() if val is not None}
-            result = self.count_by(facet, rows=rows, skip=skip, **filters)
-            return as_json({
-                "facet": facet,
-                # "count": len(result),  # TODO : add "nunique" feature in count_by schema
-                "rows": len(result),
-                "skip": skip,
-                "filters": filters,
-                "data": {str(key): int(val) for key, val in result.items()},
-                })
-
-        @fast_api.get(uri + "/sample")
-        @forge.sign(rows, skip, *kwargs)
-        def sample(rows=10, skip=0, **kwargs):
-            filters = {key: val for key, val in kwargs.items() if val is not None}
-            result = self.sample(rows=rows, skip=skip, **filters)
-            count = self.count(**filters)
-            return as_json({
-                # "facet": facet,
-                "count": count,
-                "rows": len(result),
-                "skip": skip,
-                "filters": filters,
-                "data": result.to_dict(orient='records'),
-                })
+    def metadata(self):
+        return {
+            "name": self.name,
+            "description": self.description,
+            "columns": self.columns,
+            "facets": self.facets,
+            }
