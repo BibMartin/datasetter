@@ -14,14 +14,17 @@ def test_as_json():
 
 
 def test_dataframe():
-    with pytest.raises(NotImplementedError):
-        Dataset(pd.DataFrame(), [])
+    dataset = Dataset()
+    assert dataset.metadata() == {'name': None,
+                                  'description': None,
+                                  'columns': None,
+                                  'facets': None}
 
     with pytest.raises(NotImplementedError):
-        Dataset.count(None)
+        dataset.count()
 
     with pytest.raises(NotImplementedError):
-        Dataset.count_by(None, 'facet')
+        dataset.count_by('facet')
 
     with pytest.raises(NotImplementedError):
-        Dataset.sample(None)
+        dataset.sample()

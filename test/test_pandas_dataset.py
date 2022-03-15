@@ -26,7 +26,7 @@ metadata = {
         {"name": "number", "type": "integer", "description": "A column with numbers."},
         ]}
 
-dataset = PandasDataset(df, ['letter', 'greek'], metadata=metadata)
+dataset = PandasDataset(df, **metadata)
 
 
 def test_count():

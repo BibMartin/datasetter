@@ -4,10 +4,9 @@ import pandas as pd
 
 
 class PandasDataset(Dataset):
-    def __init__(self, dataframe, facets, metadata=None):
+    def __init__(self, dataframe, **kwargs):
+        super().__init__(**kwargs)
         self.data = dataframe
-        self.facets = facets
-        self.metadata = metadata
 
     def _facet_filters(self, **filters):
         ind = pd.Series(True, index=self.data.index)
