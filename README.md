@@ -73,3 +73,34 @@ Name: greek, dtype: int64
    'description': 'A column with numbers.'}],
  'facets': ['letter', 'greek']}
 ```
+
+
+## Create an API with `datasetter` and `fastapi`
+
+Datasetter comes with a wrapper to simply create an API based on your datasets.
+Based on the code above, just add :
+
+```python
+>>> from fastapi import FastAPI
+>>> from datasetter.api import add_dataset
+
+>>> app = FastAPI()
+>>> add_dataset(app, 'random-letters', dataset)
+```
+
+Then your have a `fastAPI` application that you can run with `uvicorn` :
+
+```bash
+$ uvicorn main:app --host 0.0.0.0 --port 8000
+```
+
+or
+
+```python
+>>> import uvicorn
+>>> uvicorn.run(
+>>>     app,
+>>>     host="0.0.0.0",
+>>>     port=8000,
+>>> )
+```
